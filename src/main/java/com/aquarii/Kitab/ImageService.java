@@ -37,12 +37,23 @@ public class ImageService {
 		this.resourceLoader = resourceLoader;
 	}
 	
-
+/**
+ * 
+ * @param fileName
+ * @return: file located on server storage
+ */
 	public Resource findOneImage(String fileName) {
 		return this.resourceLoader.getResource("file:"+ UPLOAD_ROOT + "/" + fileName);
 		
 	}
 	
+	/**
+	 * CREATE
+	 * @param file
+	 * @throws IOException
+	 * create a copy of file located in local folder, copies to server storage location
+	 * && save Image POJO in DB
+	 */
 	public void createImage(MultipartFile file) throws IOException{
 		
 		if(!file.isEmpty()) {
@@ -51,17 +62,28 @@ public class ImageService {
 		}
 	}
 	
+	/**
+	 * DELETE
+	 * @param fileName
+	 * @throws IOException
+	 * Finds Image POJO by fileName
+	 * delete the Image POJO by Image object
+	 * delete the file from storage location
+	 * 
+	 */
 	public void deleteImage(String fileName) throws IOException {
 		
-		final Image ByName = this.imageRepository.findByName(fileName);
-		this.imageRepository.delete(ByName);
+		final Image image = this.imageRepository.findByName(fileName);
+		this.imageRepository.delete(image);
 		Files.deleteIfExists(Paths.get(UPLOAD_ROOT,fileName));
 		
 	}
 	
 	@Bean
-	@Profile("local")
+	//@Profile("local")
 	CommandLineRunner setUp(ImageRepository imageRepository) {
+		
+		System.out.println("######################## DELETE IMAGE ##############################");
 		
 		return (args) -> {
 			FileSystemUtils.deleteRecursively(new File(UPLOAD_ROOT));
